@@ -23,3 +23,13 @@ def Quarter_Round(a: int, b: int, c: int, d: int):
 
 	return a, b, c, d
 
+
+
+def Qround(state, i1, i2, i3, i4):
+	state = [int(i, 16) for i in state]
+
+	state[i1], state[i2], state[i3], state[i4] = Quarter_Round(state[i1], state[i2], state[i3], state[i4])
+	state = [f"{num:08x}" for num in state]
+	return state
+
+

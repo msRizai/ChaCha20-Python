@@ -33,3 +33,16 @@ def Qround(state, i1, i2, i3, i4):
 	return state
 
 
+def inner_block(state):
+	state = Qround(state, 0, 4, 8, 12)
+	state = Qround(state, 1, 5, 9, 13)
+	state = Qround(state, 2, 6, 10, 14)
+	state = Qround(state, 3, 7, 11, 15)
+	state = Qround(state, 0, 5, 10, 15)
+	state = Qround(state, 1, 6, 11, 12)
+	state = Qround(state, 2, 7, 8, 13)
+	state = Qround(state, 3, 4, 9, 14)
+	return state
+
+def le_bytes2num(b, t, n):
+

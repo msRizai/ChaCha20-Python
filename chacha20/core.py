@@ -120,9 +120,8 @@ def unpadding(msg):
         i = 1
         while(msg[-i] != 128):
                 i += 1
-        msg1 = msg[:-i]
-        uncoded = "".join(chr(c) for c in msg1)
-        return uncoded
+        unpadded = "".join(chr(c) for c in msg[:-i])
+        return unpadded
 
 
 def chacha20_encrypt(key, counter, nonce, text):

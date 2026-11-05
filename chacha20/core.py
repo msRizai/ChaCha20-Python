@@ -65,7 +65,7 @@ def mod2to32(state, initial_state):
 
 def le_bytes2num(b, t, n): # b[t][n]
         words = []
-        print(f"the length of b is : {len(b)}")
+#        print(f"the length of b is : {len(b)}")
         assert len(b) == t*n
         for i in range(t):
                 piece = b[i*n : (i+1) * n]
@@ -89,22 +89,47 @@ def key_setup(key, counter, nonce):
 def chacha20_block(key, counter, nonce):
         state = key_setup(key, counter, nonce)  # constant | key | counter | nonce
         initial_state = state.copy()
-        print([f"{i:08x}" for i in state])
+#        print([f"{i:08x}" for i in state])
 
         for i in range(10):
                 state = inner_block(state)
-        print("\n After the 20 round mixing: \n")
-        print([f"{i:08x}" for i in state])
+#        print("\n After the 20 round mixing: \n")
+#        print([f"{i:08x}" for i in state])
 
-        print("\n After the XoR and mod 2^32: \n")
+#        print("\n After the XoR and mod 2^32: \n")
         state = mod2to32(state, initial_state)
-        print([f"{i:08x}" for i in state])
+#        print([f"{i:08x}" for i in state])
 
         return serialize(state)
 
+# Takes a message in text format as a string and outputs and array of assci code of each letter in the text.
+# in the array it adds terminator character, '1', plus bytes of zero for making the length of the text divisble by 64
 
 
+def padding(msg):
+        zeros = (64 - ((len(msg) + 1) % 64)) % 64
+        byte_msg = [int(m,16) for m in [f"{m:02x}" for m in test.encode()]]
+        byte_msg.append(int('80', 16))
+        for _ in range(zeros):
+                byte_msg.append(int('00', 16))
+        return byte_msg
+
+# removes zeros and the text terminator
+# takes an array of ascii codes and return a text string
+def unpadding(msg):
+        i = 1
+        while(msg[-i] != 128):
+                i += 1
+        msg1 = msg[:-i]
+        uncoded = "".join(chr(c) for c in msg1)
+        return uncoded
 
 
-
-
+def chacha20_encrypt(key, counter, nonce, text):
+        padded_text = padding(text)
+        encrypted_text = []
+        for i in range(len(padded_text) // 64):
+                keyS = chacha20_block(key, counter+i, nonce)
+                block = padded_text[i*64:(i+1)*64]
+                encrypted_text.extend(b ^ k for b, k in zip(block, keyS))
+        return encrypted_text

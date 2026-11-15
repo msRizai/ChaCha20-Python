@@ -104,32 +104,28 @@ def chacha20_block(key, counter, nonce):
 
         return serialize(state)
 
-def padding(message_clair: bytes) -> bytes:
-    longueur_pad = 64 - (len(message_clair) % 64)
+def padding(plaintext: bytes) -> bytes:
+    longueur_pad = 64 - (len(plaintext) % 64)
     if longueur_pad == 64:
         longueur_pad = 0
-    return message_clair + b'\x00' * longueur_pad
+    return plaintext + b'\x00' * longueur_pad
 
-def ChaCha20_encrypt(cle, compteur, nonce, message_clair: bytes) -> bytes:
-    message_padde = padding(message_clair)
-    nombre_blocs = len(message_padde) // 64
+def ChaCha20_encrypt(key, compteur, nonce, plaintext: bytes) -> bytes:
+    plaintext_pad = padding(plaintext)
+    nombre_blocs = len(plaintext_pad) // 64
     octets_chiffres = bytearray()
+    
     compteur_courant = compteur
     for i in range(nombre_blocs):
-        flux_chiffrant = bloc_chacha20(cle, compteur_courant, nonce)
-        bloc_clair = message_padde[i * 64 : (i + 1) * 64]
+        bloc_flux = bloc_chacha20(key, compteur_courant, nonce)
+        bloc_clair = plaintext_pad[i * 64 : (i + 1) * 64]
         
-        bloc_chiffre = bytes(p ^ f for p, f in zip(bloc_clair, flux_chiffrant))
-        octets_chiffres.extend(bloc_chiffre)
+        cyphertext = bytes(p ^ f for p, f in zip(bloc_clair, bloc_flux))
+        octets_chiffres.extend(cyphertext)
         
         compteur_courant += 1
         
     return bytes(octets_chiffres)
 
-def ChaCha20_decrypt(cle, compteur, nonce, message_chiffre: bytes) -> bytes:
-    return chiffrer_chacha20(cle, compteur, nonce, message_chiffre)
-
-
-
-
-
+def ChaCha20_decrypt(key, compteur, nonce, ciphertext: bytes) -> bytes:
+    return ChaCha20_encrypt(key, counter, nonce, ciphertext)

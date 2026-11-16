@@ -23,5 +23,5 @@ def chacha20_decrypt(key , counter, cipher, nonce):
         for i in range(len(cipher) // 64):
                 keyS = chacha20_block(key, counter+i, nonce)
                 block = cipher[i*64:(i+1)*64]
-                decrypted.extend(b ^ k for b in block and k in keyS))
+                decrypted.extend(b ^ k for b, k in zip(block, keyS))
         return pad.unpadding(decrypted)  # an array of asccii values

@@ -8,8 +8,8 @@ def writing_cipher(cipher, nonce, file): # file e.g. "/home/user/cipher.txt"
                 f.write(bytes(cipher).hex() + "\n")
 
 def writing_msg(msg, file):
-        with open(file, "w") as f:
-                f.write("".join(char(a) for a in msg))
+        with open(file, "wb") as f:
+                f.write(bytes(msg))  # msg is a list of ascii values
 
 def reading_key(file):
         with open(file, "r") as f:
@@ -18,7 +18,7 @@ def reading_key(file):
 def reading_cipher(file):
         with open(file, "r") as f:
                 nonce = f.readline().strip().split(":")
-                cipher = list(bytes.fromhex(f.readline().strip())
+                cipher = list(bytes.fromhex(f.readline().strip()))
                 return nonce, cipher   # returns the cipher with nonce for decrypting
 
 def reading_msg(file):
